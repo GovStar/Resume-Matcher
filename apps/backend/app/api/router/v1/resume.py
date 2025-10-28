@@ -260,3 +260,29 @@ async def get_resume(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error fetching resume data",
         )
+    
+#Updated for GovStar.
+@resume_router.get(
+    "/count",
+    summary="Get resume data from both resume and processed_resume models",
+)
+async def get_count(
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+):
+    try:
+        resume_service = ResumeService(db)
+        count = await resume_service.get_count()
+
+        return JSONResponse(
+            content={
+                "Processed Resume Count":count
+            }
+        )
+    
+    except Exception as e:
+        logger.error(f"Error occured in get count: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Error fetching resume data",
+        )

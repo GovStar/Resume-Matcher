@@ -5,6 +5,7 @@ import FileUpload from '@/components/common/file-upload';
 
 export default function UploadResume() {
 	return (
+		// Used to upload the user's resume file
 		<BackgroundContainer innerClassName="justify-start pt-16">
 			<div className="w-full max-w-md mx-auto flex flex-col items-center gap-6">
 				<h1 className="text-4xl font-bold text-center text-white mb-6">

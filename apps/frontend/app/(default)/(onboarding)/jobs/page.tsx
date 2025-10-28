@@ -3,6 +3,7 @@ import BackgroundContainer from '@/components/common/background-container';
 import { Suspense } from 'react';
 
 const ProvideJobDescriptionsPage = () => {
+	// Used to upload job descriptions for resume matching
 	return (
 		<BackgroundContainer>
 			<div className="flex flex-col items-center justify-center max-w-7xl">

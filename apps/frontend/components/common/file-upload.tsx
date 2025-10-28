@@ -45,6 +45,7 @@ export default function FileUpload() {
 	] = useFileUpload({
 		maxSize,
 		accept: acceptString,
+		//TODO: Multiple = True. Don't know how this will impact downstream logic.
 		multiple: false,
 		uploadUrl: API_RESUME_UPLOAD_URL,
 		onUploadSuccess: (uploadedFile, response) => {
@@ -69,6 +70,8 @@ export default function FileUpload() {
 			});
 			clearErrors();
 			const encodedResumeId = encodeURIComponent(resumeId);
+			
+			// TODO: Set this to return to home dash.
 			window.location.href = `/jobs?resume_id=${encodedResumeId}`;
 		},
 		onUploadError: (file, errorMsg) => {

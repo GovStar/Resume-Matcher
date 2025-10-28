@@ -6,7 +6,7 @@ import logging
 
 from markitdown import MarkItDown
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select
+from sqlalchemy.future import select, func
 from pydantic import ValidationError
 from typing import Dict, Optional
 
@@ -312,3 +312,9 @@ class ResumeService:
             }
 
         return combined_data
+
+    # Added for GovStar
+    async def get_count(self):
+        stmt = select(func.count()).select_from(ProcessedResume)
+        result = await self.db.execute(stmt)
+        return result.scalar_one()

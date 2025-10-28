@@ -52,3 +52,13 @@ export async function improveResume(
     console.log('Resume improvement response:', data);
     return data;
 }
+
+export async function resumeCount():Promise<number> {
+    const res = await fetch(`${API_URL}/api/v1/resumes/count`, {
+        method: 'get',
+    });
+    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+    const data = await res.json();
+    console.log('Job upload response:', data);
+    return data.Processed_Resume_Count
+}

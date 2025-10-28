@@ -1,6 +1,7 @@
 PROMPT = """
 You are a JSON extraction engine. Convert the following resume text into precisely the JSON schema specified below.
 - Do not compose any extra fields or commentary.
+- If a field is required but data cannot be found then use an empty string.
 - Do not make up values for any fields.
 - Use "Present" if an end date is ongoing.
 - Make sure dates are in YYYY-MM-DD.
