@@ -18,7 +18,9 @@ export default function ResumePage() {
         fetchResume();
     }, [id]);
 
-    const p_resume = resume.processed_resume;
+    const p_resume = resume?.processed_resume;
+
+    if (!p_resume) return <div>Loading...</div>;
 
     const preview: ResumeData = {
         personalInfo: {

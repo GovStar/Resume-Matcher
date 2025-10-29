@@ -100,17 +100,17 @@ export default function Hero() {
 					<table className="table-fixed border w-full mt-4">
 						<thead className="border">
 							<tr className="text-left">
-								<th>Job ID</th>
-								<th>Job Title</th>
-								<th>Company Profile</th>
+								<th className="p-3">Job ID</th>
+								<th className="p-3">Job Title</th>
+								<th className="p-3">Company Profile</th>
 							</tr>
 						</thead>
 						<tbody>
 							{allJobs?.map((job) => (
 								<tr key={job.job_id}>
-									<td className="text-blue-500 hover:text-blue-700"><Link href={`/jobs/${job.job_id}`}>{job.job_id}</Link></td>
-									<td>{job.job_title}</td>
-									<td>{job.company_profile.company_name}</td>
+									<td className="text-blue-500 hover:text-blue-700 p-3"><Link href={`/jobs/${job.job_id}`}>{job.job_id}</Link></td>
+									<td className="p-3">{job.job_title}</td>
+									<td className="p-3">{job.company_profile.company_name}</td>
 								</tr>
 							))}
 						</tbody>
@@ -122,27 +122,27 @@ export default function Hero() {
 					<table className="table-fixed border w-full mt-4">
 						<thead>
 							<tr className="text-left">
-								<th>Resume ID</th>
-								<th>User Email</th>
-								<th>Experiences</th>
-								<th>Education</th>
-								<th>Keywords</th>
+								<th className="p-3">Resume ID</th>
+								<th className="p-3">User Email</th>
+								<th className="p-3">Experiences</th>
+								<th className="p-3">Education</th>
+								<th className="p-3">Keywords</th>
 							</tr>
 						</thead>
 						<tbody>
 							{allResumes.map((resume) => (
 								<tr key={resume.resume_id} className="border">
-									<td className="text-blue-500 hover:text-blue-700"><Link href={`/resumes/${resume.resume_id}`}>{resume.resume_id}</Link></td>
-									<td>{resume.processed_resume.personal_data.email}</td>
-									<td>
-										<ul className="list-disc list-inside">{resume.processed_resume.experiences.map((experience: any) => (
-											<li key={experience.company}>
+									<td className="text-blue-500 hover:text-blue-700 p-3"><Link href={`/resumes/${resume.resume_id}`}>{resume.resume_id}</Link></td>
+									<td className="p-3">{resume.processed_resume.personal_data.email}</td>
+									<td className="p-3">
+										<ul className="list-disc list-inside">{resume.processed_resume.experiences.slice(0, 3).map((experience: any, index: number) => (
+											<li key={index}>
 												{`${experience.job_title} at ${experience.company}`}
 											</li>))}
 										</ul>
 									</td>
-									<td>{resume.processed_resume.education.map((education: any) => education.institution).join(', ')}</td>
-									<td>
+									<td className="p-3">{resume.processed_resume.education.map((education: any) => education.institution).join(', ')}</td>
+									<td className="p-3">
 										{resume.processed_resume.extracted_keywords.join(', ')}
 									</td>
 								</tr>
