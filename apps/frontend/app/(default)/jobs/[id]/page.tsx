@@ -56,17 +56,10 @@ export default function JobPage() {
     }
 
     return (
-        <div className="p-5">
-            <h1 className="text-2xl font-bold">Job {id}</h1>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div>
-                    <div className="flex-grow ">
-                        <h2 className="text-lg font-bold">Raw Job Description</h2>
-                        {job?.raw_job?.content}
-                    </div>
-                </div>
-                <div>
-                    <h2 className="text-lg font-bold">Processed Job Description</h2>
+        <div className="p-5 w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="border p-5 gap-5">
+                    <h1 className="text-2xl font-bold">Job {id}</h1>
                     <h3 className="text-md font-bold">Job Title</h3>
                     {job?.processed_job?.job_title}
                     <h3 className="text-md font-bold">Summary</h3>
@@ -111,18 +104,18 @@ export default function JobPage() {
                     <h2 className="text-lg font-bold">Resumes</h2>
                     <table className="table-fixed border w-full">
                         <thead>
-                            <tr>
-                                <th>Resume ID</th>
-                                <th>Profile</th>
-                                <th>Score</th>
+                            <tr className="text-left p-5">
+                                <th className="p-5">Resume ID</th>
+                                <th className="p-5">Profile</th>
+                                <th className="text-right p-5">Score</th>
                             </tr>
                         </thead>
                         <tbody>
                             {resumes.map((resume) => (
-                                <tr key={resume.resume_id}>
-                                    <td><Link href={`/resumes/${resume.resume_id}`}>{resume.resume_id}</Link></td>
-                                    <td>{resume.processed_resume.personal_data.email}</td>
-                                    <td>{getJobResumeScore(resume.resume_id)}</td>
+                                <tr key={resume.resume_id} className="p-5">
+                                    <td className="text-blue-500 hover:text-blue-700 p-5"><Link href={`/resumes/${resume.resume_id}`}>{resume.resume_id}</Link></td>
+                                    <td className="p-5">{resume.processed_resume.personal_data.email}</td>
+                                    <td className="text-right font-bold text-2xl p-5">{getJobResumeScore(resume.resume_id)}</td>
                                 </tr>
                             ))}
                         </tbody>

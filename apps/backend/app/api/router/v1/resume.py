@@ -13,6 +13,7 @@ from fastapi import (
     Request,
     status,
     Query,
+    BackgroundTasks,
 )
 
 from app.core import get_db_session
@@ -39,7 +40,8 @@ logger = logging.getLogger(__name__)
 )
 async def upload_resume(
     request: Request,
-    file: UploadFile = File(...),
+    file: UploadFile,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
 ):
     """
@@ -117,6 +119,8 @@ async def upload_resume(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing file: {str(e)}",
         )
+    score_improvement_service = ScoreImprovementService(db=db)
+    background_tasks.add_task(score_improvement_service.run_resume, resume_id)
 
     return {
         "message": f"File {file.filename} successfully processed as MD and stored in the DB",

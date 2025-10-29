@@ -200,7 +200,25 @@ class ScoreImprovementService:
             return None
         return resume_preview.model_dump()
 
-    async def run(self, resume_id: str, job_id: str) -> Dict:
+    async def run_resume(self, resume_id: str):
+        query = select(Job)
+        result = await self.db.execute(query)
+        jobs = result.scalars().all()
+        logger.info(f"Jobs: {jobs}")
+
+        for job in jobs:
+            await self.run(resume_id, job.job_id, improve=False)
+
+    async def run_job_scores(self, job_id: str):
+        query = select(Resume)
+        result = await self.db.execute(query)
+        resumes = result.scalars().all()
+        logger.info(f"Resumes: {resumes}")
+
+        for resume in resumes:
+            await self.run(resume.resume_id, job_id, improve=False)
+
+    async def run(self, resume_id: str, job_id: str, improve: bool = True) -> Dict:
         """
         Main method to run the scoring and improving process and return dict.
         """
@@ -242,22 +260,30 @@ class ScoreImprovementService:
         cosine_similarity_score = self.calculate_cosine_similarity(
             extracted_job_keywords_embedding, resume_embedding
         )
-        updated_resume, updated_score = await self.improve_score_with_llm(
-            resume=resume.content,
-            extracted_resume_keywords=extracted_resume_keywords,
-            job=job.content,
-            extracted_job_keywords=extracted_job_keywords,
-            previous_cosine_similarity_score=cosine_similarity_score,
-            extracted_job_keywords_embedding=extracted_job_keywords_embedding,
-        )
+        if improve:
+            updated_resume, updated_score = await self.improve_score_with_llm(
+                resume=resume.content,
+                extracted_resume_keywords=extracted_resume_keywords,
+                job=job.content,
+                extracted_job_keywords=extracted_job_keywords,
+                previous_cosine_similarity_score=cosine_similarity_score,
+                extracted_job_keywords_embedding=extracted_job_keywords_embedding,
+            )
 
-        resume_preview = await self.get_resume_for_previewer(
-            updated_resume=updated_resume
-        )
+            resume_preview = await self.get_resume_for_previewer(
+                updated_resume=updated_resume
+            )
+            
+            logger.info(f"Resume Preview: {resume_preview}")
+        else:
+            updated_resume = resume.content
+            updated_score = cosine_similarity_score
+            resume_preview = await self.get_resume_for_previewer(
+                updated_resume=updated_resume
+            )
 
         await self.save_score(resume_id, job_id, updated_score)
 
-        logger.info(f"Resume Preview: {resume_preview}")
 
         execution = {
             "resume_id": resume_id,

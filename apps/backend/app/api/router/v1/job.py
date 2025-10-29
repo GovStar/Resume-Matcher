@@ -3,9 +3,10 @@ import logging
 import traceback
 
 from uuid import uuid4
+from app.services.score_improvement_service import ScoreImprovementService
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.declarative import DeclarativeMeta
-from fastapi import APIRouter, HTTPException, Depends, Request, status, Query
+from fastapi import APIRouter, HTTPException, Depends, Request, status, Query, BackgroundTasks
 from fastapi.responses import JSONResponse
 
 from app.core import get_db_session
@@ -22,6 +23,7 @@ logger = logging.getLogger(__name__)
 async def upload_job(
     payload: JobUploadRequest,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
 ):
     """
@@ -61,6 +63,10 @@ async def upload_job(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{str(e)}",
         )
+
+    score_improvement_service = ScoreImprovementService(db=db)
+    for job_id in job_ids:
+        background_tasks.add_task(score_improvement_service.run_job_scores, job_id)
 
     return {
         "message": "data successfully processed",
