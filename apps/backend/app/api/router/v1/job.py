@@ -1,8 +1,10 @@
+import json
 import logging
 import traceback
 
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.ext.declarative import DeclarativeMeta
 from fastapi import APIRouter, HTTPException, Depends, Request, status, Query
 from fastapi.responses import JSONResponse
 
@@ -12,7 +14,6 @@ from app.schemas.pydantic.job import JobUploadRequest
 
 job_router = APIRouter()
 logger = logging.getLogger(__name__)
-
 
 @job_router.post(
     "/upload",
@@ -132,3 +133,27 @@ async def get_job(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error fetching job data",
         )
+
+@job_router.get(
+    "/all",
+    summary="Get all jobs"
+)
+async def get_all_jobs(
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+):
+    job_service = JobService(db)
+    jobs = await job_service.get_all_jobs()
+    return JSONResponse(
+        content={
+            "data": [
+                {
+                    "job_id": job['job_id'],
+                    "job_title": job['job_title'],
+                    "company_profile": json.loads(job['company_profile']),
+                    # "content": job['content'],
+                }
+                for job in jobs
+            ],
+        }
+    )

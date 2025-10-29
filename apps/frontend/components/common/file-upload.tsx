@@ -46,7 +46,7 @@ export default function FileUpload() {
 		maxSize,
 		accept: acceptString,
 		//TODO: Multiple = True. Don't know how this will impact downstream logic.
-		multiple: false,
+		multiple: true,
 		uploadUrl: API_RESUME_UPLOAD_URL,
 		onUploadSuccess: (uploadedFile, response) => {
 			console.log('Upload successful:', uploadedFile, response);

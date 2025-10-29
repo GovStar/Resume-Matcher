@@ -44,14 +44,14 @@ const BackgroundContainer = ({
 				)}
 			>
 				{/* Dot pattern component for visual effect */}
-				<DotPattern
+				{/* <DotPattern
 					cr={2} // Circle radius for dots
 					glow={true} // Enable glow effect
 					className={cn(
 						'absolute inset-0 -z-10 text-violet-400 [mask-image:radial-gradient(400px_circle_at_center,white,transparent)]',
 						dotClassName,
 					)}
-				/>
+				/> */}
 				{/* Render children content above the dot pattern */}
 				<div className="relative z-10 w-full h-full flex flex-col items-center justify-center">
 					{children}

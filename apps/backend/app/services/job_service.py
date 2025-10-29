@@ -26,19 +26,19 @@ class JobService:
         """
         Stores job data in the database and returns a list of job IDs.
         """
-        resume_id = str(job_data.get("resume_id"))
+        # resume_id = str(job_data.get("resume_id"))
 
-        if not await self._is_resume_available(resume_id):
-            raise AssertionError(
-                f"resume corresponding to resume_id: {resume_id} not found"
-            )
+        # if not await self._is_resume_available(resume_id):
+        #     raise AssertionError(
+        #         f"resume corresponding to resume_id: {resume_id} not found"
+        #     )
 
         job_ids = []
         for job_description in job_data.get("job_descriptions", []):
             job_id = str(uuid.uuid4())
             job = Job(
                 job_id=job_id,
-                resume_id=str(resume_id),
+                # resume_id=str(resume_id),
                 content=job_description,
             )
             self.db.add(job)
@@ -194,3 +194,17 @@ class JobService:
             }
 
         return combined_data
+
+    async def get_all_jobs(self):
+        stmt = select(Job, ProcessedJob).join(ProcessedJob, Job.job_id == ProcessedJob.job_id)
+        result = await self.db.execute(stmt)
+        all_jobs = []
+        for row in result:
+            all_jobs.append({
+                'job_id': row.Job.job_id,
+                'job_title': row.ProcessedJob.job_title,
+                'company_profile': row.ProcessedJob.company_profile,
+                # 'content': row.Job.content,
+            })
+        logger.info(f"All jobs: {all_jobs}")
+        return all_jobs

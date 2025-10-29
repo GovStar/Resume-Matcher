@@ -14,13 +14,15 @@ logger = logging.getLogger(__name__)
 
 class OpenAIProvider(Provider):
     def __init__(self, api_key: str | None = None, model_name: str = settings.LL_MODEL,
-                 opts: Dict[str, Any] = None):
+                 base_url: str | None = None, opts: Dict[str, Any] = None):
         if opts is None:
             opts = {}
         api_key = api_key or settings.LLM_API_KEY or os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise ProviderError("OpenAI API key is missing")
-        self._client = OpenAI(api_key=api_key)
+        if not base_url:
+            raise ProviderError("OpenAI base URL is missing")
+        self._client = OpenAI(api_key=api_key, base_url=base_url)
         self.model = model_name
         self.opts = opts
         self.instructions = ""
@@ -60,7 +62,7 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         api_key = api_key or settings.EMBEDDING_API_KEY or os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise ProviderError("OpenAI API key is missing")
-        self._client = OpenAI(api_key=api_key)
+        self._client = OpenAI(api_key=api_key, base_url=settings.EMBEDDING_BASE_URL)
         self._model = embedding_model
 
     async def embed(self, text: str) -> list[float]:

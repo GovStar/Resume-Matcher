@@ -53,6 +53,16 @@ export async function improveResume(
     return data;
 }
 
+export async function getAllResumes():Promise<any[]> {
+    const res = await fetch(`${API_URL}/api/v1/resumes/all`, {
+        method: 'get',
+    });
+    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+    const data = await res.json();
+    console.log('Job upload response:', data);
+    return data.data;
+}
+
 export async function resumeCount():Promise<number> {
     const res = await fetch(`${API_URL}/api/v1/resumes/count`, {
         method: 'get',
@@ -60,5 +70,33 @@ export async function resumeCount():Promise<number> {
     if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
     const data = await res.json();
     console.log('Job upload response:', data);
-    return data.Processed_Resume_Count
+    return data.ProcessedResumeCount
+}
+
+export async function getResume(id: string):Promise<any> {
+    const res = await fetch(`${API_URL}/api/v1/resumes?resume_id=${id}`, {
+        method: 'get',
+    });
+    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+    const data = await res.json();
+    return data.data;
+}
+export async function getAllJobs():Promise<any[]> { 
+
+    const res = await fetch(`${API_URL}/api/v1/jobs/all`, {
+        method: 'get',
+    });
+    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+    const data = await res.json();
+    console.log('Job upload response:', data);
+    return data.data;
+}
+
+export async function getJob(id: string):Promise<any> {
+    const res = await fetch(`${API_URL}/api/v1/jobs?job_id=${id}`, {
+        method: 'get',
+    });
+    if (!res.ok) throw new Error(`Upload failed with status ${res.status}`);
+    const data = await res.json();
+    return data.data;
 }

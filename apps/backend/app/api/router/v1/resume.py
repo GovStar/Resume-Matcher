@@ -225,6 +225,23 @@ async def score_and_improve(
             detail="sorry, something went wrong!",
         )
 
+@resume_router.get(
+    "/all",
+    summary="Get all resumes",
+)
+async def get_all_resumes(
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+):
+    resume_service = ResumeService(db)
+    resumes = await resume_service.get_all_resumes()
+
+    return JSONResponse(
+        content={
+            "data": resumes,
+        }
+    )
+
 
 @resume_router.get(
     "",
@@ -303,7 +320,7 @@ async def get_count(
 
         return JSONResponse(
             content={
-                "Processed Resume Count":count
+                "ProcessedResumeCount":count
             }
         )
     
