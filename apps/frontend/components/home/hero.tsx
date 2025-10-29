@@ -74,7 +74,7 @@ export default function Hero() {
 				</div>
 				<div className="my-6 flex flex-row gap-4">
 					<Link
-						href="/resume"
+						href="/resumes"
 						className="group relative inline-flex h-10 overflow-hidden rounded-full p-[1px]"
 					>
 						<span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#3A59D1_0%,#7AC6D2_50%,#3A59D1_100%)]" />
