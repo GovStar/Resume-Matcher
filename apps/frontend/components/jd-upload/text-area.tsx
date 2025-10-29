@@ -38,10 +38,10 @@ export default function JobDescriptionUploadTextArea() {
 				setFlash({ type: 'error', message: 'Job description cannot be empty.' });
 				return;
 			}
-			if (!resumeId) {
-				setFlash({ type: 'error', message: 'Missing resume ID.' });
-				return;
-			}
+			// if (!resumeId) {
+			// 	setFlash({ type: 'error', message: 'Missing resume ID.' });
+			// 	return;
+			// }
 
 			setSubmissionStatus('submitting');
 			try {

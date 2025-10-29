@@ -13,6 +13,7 @@ from fastapi import (
     Request,
     status,
     Query,
+    BackgroundTasks,
 )
 
 from app.core import get_db_session
@@ -39,7 +40,8 @@ logger = logging.getLogger(__name__)
 )
 async def upload_resume(
     request: Request,
-    file: UploadFile = File(...),
+    file: UploadFile,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
 ):
     """
@@ -117,6 +119,8 @@ async def upload_resume(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error processing file: {str(e)}",
         )
+    score_improvement_service = ScoreImprovementService(db=db)
+    background_tasks.add_task(score_improvement_service.run_resume, resume_id)
 
     return {
         "message": f"File {file.filename} successfully processed as MD and stored in the DB",
@@ -225,6 +229,23 @@ async def score_and_improve(
             detail="sorry, something went wrong!",
         )
 
+@resume_router.get(
+    "/all",
+    summary="Get all resumes",
+)
+async def get_all_resumes(
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+):
+    resume_service = ResumeService(db)
+    resumes = await resume_service.get_all_resumes()
+
+    return JSONResponse(
+        content={
+            "data": resumes,
+        }
+    )
+
 
 @resume_router.get(
     "",
@@ -303,7 +324,7 @@ async def get_count(
 
         return JSONResponse(
             content={
-                "Processed Resume Count":count
+                "ProcessedResumeCount":count
             }
         )
     

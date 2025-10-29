@@ -6,7 +6,7 @@ import logging
 
 from markitdown import MarkItDown
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.future import select, func
+from sqlalchemy import func, select
 from pydantic import ValidationError
 from typing import Dict, Optional
 
@@ -259,11 +259,14 @@ class ResumeService:
         processed_result = await self.db.execute(processed_query)
         processed_resume = processed_result.scalars().first()
 
+        return self.combine_resume_and_processed_resume(resume, processed_resume)
+
+    def combine_resume_and_processed_resume(self, resume: Resume, processed_resume: Optional[ProcessedResume] = None, no_content: bool = False):
         combined_data = {
             "resume_id": resume.resume_id,
             "raw_resume": {
                 "id": resume.id,
-                "content": resume.content,
+                "content": resume.content if not no_content else None,
                 "content_type": resume.content_type,
                 "created_at": resume.created_at.isoformat()
                 if resume.created_at
@@ -312,6 +315,25 @@ class ResumeService:
             }
 
         return combined_data
+
+    async def get_all_resumes(self):
+        # stmt = select(Resume, ProcessedResume).join(ProcessedResume, Resume.resume_id == ProcessedResume.resume_id)
+        stmt = select(Resume)
+        all_resumes = await self.db.execute(stmt)
+        all_resumes = all_resumes.scalars().all()
+        
+        all_processed_resumes = await self.db.execute(select(ProcessedResume))
+        all_processed_resumes = all_processed_resumes.scalars().all()
+        combined = []
+
+        for resume in all_resumes:
+            processed_resume = next((p_resume for p_resume in all_processed_resumes if p_resume.resume_id == resume.resume_id), None)
+            if processed_resume is None:
+                logger.warning(f"Processed resume not found for resume_id: {resume.resume_id}")
+                continue
+            combined.append(self.combine_resume_and_processed_resume(resume, processed_resume, no_content=True))
+        
+        return combined
 
     # Added for GovStar
     async def get_count(self):

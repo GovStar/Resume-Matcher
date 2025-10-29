@@ -15,21 +15,21 @@ export const GlowingStarsBackgroundCard = ({
 
 	return (
 		<div
-			onMouseEnter={() => {
-				setMouseEnter(true);
-			}}
-			onMouseLeave={() => {
-				setMouseEnter(false);
-			}}
-			className={cn(
-				'bg-[linear-gradient(110deg,#333_0.6%,#222)] p-4 max-w-md max-h-[20rem] h-full w-full rounded-xl border border-[#eaeaea] dark:border-neutral-600',
-				className,
-			)}
+			// onMouseEnter={() => {
+			// 	setMouseEnter(true);
+			// }}
+			// onMouseLeave={() => {
+			// 	setMouseEnter(false);
+			// }}
+			// className={cn(
+			// 	'bg-[linear-gradient(110deg,#333_0.6%,#222)] p-4 max-w-md max-h-[20rem] h-full w-full rounded-xl border border-[#eaeaea] dark:border-neutral-600',
+			// 	className,
+			// )}
 		>
-			<div className="flex justify-center items-center">
+			{/* <div className="flex justify-center items-center">
 				<Illustration mouseEnter={mouseEnter} />
 			</div>
-			<div className="px-2 pb-6">{children}</div>
+			<div className="px-2 pb-6">{children}</div> */}
 		</div>
 	);
 };

@@ -1,9 +1,12 @@
+import json
 import logging
 import traceback
 
 from uuid import uuid4
+from app.services.score_improvement_service import ScoreImprovementService
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi import APIRouter, HTTPException, Depends, Request, status, Query
+from sqlalchemy.ext.declarative import DeclarativeMeta
+from fastapi import APIRouter, HTTPException, Depends, Request, status, Query, BackgroundTasks
 from fastapi.responses import JSONResponse
 
 from app.core import get_db_session
@@ -13,7 +16,6 @@ from app.schemas.pydantic.job import JobUploadRequest
 job_router = APIRouter()
 logger = logging.getLogger(__name__)
 
-
 @job_router.post(
     "/upload",
     summary="stores the job posting in the database by parsing the JD into a structured format JSON",
@@ -21,6 +23,7 @@ logger = logging.getLogger(__name__)
 async def upload_job(
     payload: JobUploadRequest,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db_session),
 ):
     """
@@ -60,6 +63,10 @@ async def upload_job(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"{str(e)}",
         )
+
+    score_improvement_service = ScoreImprovementService(db=db)
+    for job_id in job_ids:
+        background_tasks.add_task(score_improvement_service.run_job_scores, job_id)
 
     return {
         "message": "data successfully processed",
@@ -132,3 +139,27 @@ async def get_job(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Error fetching job data",
         )
+
+@job_router.get(
+    "/all",
+    summary="Get all jobs"
+)
+async def get_all_jobs(
+    request: Request,
+    db: AsyncSession = Depends(get_db_session),
+):
+    job_service = JobService(db)
+    jobs = await job_service.get_all_jobs()
+    return JSONResponse(
+        content={
+            "data": [
+                {
+                    "job_id": job['job_id'],
+                    "job_title": job['job_title'],
+                    "company_profile": json.loads(job['company_profile']),
+                    # "content": job['content'],
+                }
+                for job in jobs
+            ],
+        }
+    )
