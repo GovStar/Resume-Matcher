@@ -131,9 +131,13 @@ class ScoreImprovementService:
         """
         Calculates the cosine similarity between two embeddings.
         """
-        logger.info(f"Calculating cosine similarity between {extracted_job_keywords_embedding} and {resume_embedding}")
+        logger.info(
+            f"Calculating cosine similarity between {extracted_job_keywords_embedding} and {resume_embedding}"
+        )
         if resume_embedding is None or extracted_job_keywords_embedding is None:
-            logger.warning(f"Cosine similarity calculation failed: {resume_embedding} or {extracted_job_keywords_embedding} is None")
+            logger.warning(
+                f"Cosine similarity calculation failed: {resume_embedding} or {extracted_job_keywords_embedding} is None"
+            )
             return 0.0
 
         ejk = np.asarray(extracted_job_keywords_embedding).squeeze()
@@ -222,11 +226,15 @@ class ScoreImprovementService:
         """
         Main method to run the scoring and improving process and return dict.
         """
-        logger.info(f"Running score improvement service for resume {resume_id} and job {job_id}")
+        logger.info(
+            f"Running score improvement service for resume {resume_id} and job {job_id}"
+        )
 
         job_resume_score = await self.get_score(resume_id, job_id)
         if job_resume_score:
-            logger.info(f"Score found for resume {resume_id} and job {job_id}: {job_resume_score.score}")
+            logger.info(
+                f"Score found for resume {resume_id} and job {job_id}: {job_resume_score.score}"
+            )
             return {
                 "resume_id": resume_id,
                 "job_id": job_id,
@@ -273,7 +281,7 @@ class ScoreImprovementService:
             resume_preview = await self.get_resume_for_previewer(
                 updated_resume=updated_resume
             )
-            
+
             logger.info(f"Resume Preview: {resume_preview}")
         else:
             updated_resume = resume.content
@@ -283,7 +291,6 @@ class ScoreImprovementService:
             )
 
         await self.save_score(resume_id, job_id, updated_score)
-
 
         execution = {
             "resume_id": resume_id,
@@ -366,7 +373,9 @@ class ScoreImprovementService:
         """
         Gets the score for a resume and job.
         """
-        query = select(JobResumeScore).where(JobResumeScore.resume_id == resume_id, JobResumeScore.job_id == job_id)
+        query = select(JobResumeScore).where(
+            JobResumeScore.resume_id == resume_id, JobResumeScore.job_id == job_id
+        )
         result = await self.db.execute(query)
         score = result.scalars().first()
         return score
@@ -375,7 +384,14 @@ class ScoreImprovementService:
         """
         Saves the score for a resume and job.
         """
-        logger.info(f"Saving score for resume {resume_id} and job {job_id}: {score}")
-        score = JobResumeScore(resume_id=resume_id, job_id=job_id, score=score)
-        self.db.add(score)
+        jr_score = await self.get_score(resume_id, job_id)
+
+        if jr_score:
+            jr_score.score = score
+        else:
+            logger.info(
+                f"Saving score for resume {resume_id} and job {job_id}: {score}"
+            )
+            jr_score = JobResumeScore(resume_id=resume_id, job_id=job_id, score=score)
+        self.db.add(jr_score)
         await self.db.commit()
